@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { hasErrorField } from "../../utils/has-error-field"
+import ErrorMessage from "../../components/error-message"
 
 /*
 прям из этого компонента можем менять 
@@ -75,6 +76,7 @@ const Login: React.FC<Props> = ({ setSelected }) => {
         type="password"
         required="Обязательное поле"
       />
+      <ErrorMessage error={error} />
       <p className="text-center text-small">
         Нет аккаунта? {/* линк не роута, переключает с логина на регистр*/}
         <Link

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { useRegisterMutation } from "../../app/services/userApi"
 import { useState } from "react"
 import { hasErrorField } from "../../utils/has-error-field"
+import ErrorMessage from "../../components/error-message"
 type Register = {
   email: string
   name: string
@@ -63,6 +64,7 @@ const Register: React.FC<Props> = ({ setSelected }) => {
         type="password"
         required="Обязательное поле"
       />
+      <ErrorMessage error={error} />
       <p className="text-center text-small">
         Уже есть аккаунт? {/* линк не роута, переключает с логина на регистр*/}
         <Link
@@ -72,12 +74,12 @@ const Register: React.FC<Props> = ({ setSelected }) => {
             setSelected("login")
           }}
         >
-          Зарегистрируйтесь
+          Войти
         </Link>
       </p>
       <div className="flex gap-2 justify-end">
         <Button fullWidth color="primary" type="submit" isLoading={isLoading}>
-          Войти
+          Зарегистрироваться
         </Button>
       </div>
     </form>
