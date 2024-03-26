@@ -1,58 +1,39 @@
 import type React from "react"
-import { useForm } from "react-hook-form"
 import Input from "../../components/input"
 import { Button, Link } from "@nextui-org/react"
-import {
-  useLazyCurrentQuery,
-  useLoginMutation,
-} from "../../app/services/userApi"
-import { useNavigate } from "react-router-dom"
+import { useForm } from "react-hook-form"
+import { useRegisterMutation } from "../../app/services/userApi"
 import { useState } from "react"
 import { hasErrorField } from "../../utils/has-error-field"
-
-/*
-прям из этого компонента можем менять 
-либо вход 
-либо регистрация
-и когда зарегестрировались, должны поменять на вход (таб)
-*/
-
-type Login = {
+type Register = {
   email: string
+  name: string
   password: string
 }
-
 type Props = {
   setSelected: (value: string) => void
 }
-
-const Login: React.FC<Props> = ({ setSelected }) => {
+const Register: React.FC<Props> = ({ setSelected }) => {
   const {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<Login>({
+  } = useForm<Register>({
     mode: "onChange",
     reValidateMode: "onBlur",
     defaultValues: {
       email: "",
       password: "",
+      name: "",
     },
   })
 
-  //apihe4ka для входа
-  const [login, { isLoading }] = useLoginMutation()
-  const navigate = useNavigate()
+  const [register, { isLoading }] = useRegisterMutation()
   const [error, setError] = useState("")
-
-  //после логина запрос текущего пользователя
-  const [triggerCurrentCuery] = useLazyCurrentQuery()
-
-  //unwrap - чтобы если ошибка упала в кетч
-
-  const onSubmit = async (data: Login) => {
+  const onSubmit = async (data: Register) => {
     try {
-      await login(data).unwrap()
+      await register(data).unwrap()
+      setSelected("login")
     } catch (error) {
       if (hasErrorField(error)) {
         setError(error.data.error)
@@ -61,6 +42,13 @@ const Login: React.FC<Props> = ({ setSelected }) => {
   }
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        control={control}
+        name="name"
+        label="Имя"
+        type="text"
+        required="Обязательное поле"
+      />
       <Input
         control={control}
         name="email"
@@ -76,12 +64,12 @@ const Login: React.FC<Props> = ({ setSelected }) => {
         required="Обязательное поле"
       />
       <p className="text-center text-small">
-        Нет аккаунта? {/* линк не роута, переключает с логина на регистр*/}
+        Уже есть аккаунт? {/* линк не роута, переключает с логина на регистр*/}
         <Link
           size="sm"
           className="cursor-pointer"
           onPress={() => {
-            setSelected("sign-up")
+            setSelected("login")
           }}
         >
           Зарегистрируйтесь
@@ -96,4 +84,4 @@ const Login: React.FC<Props> = ({ setSelected }) => {
   )
 }
 
-export default Login
+export default Register
