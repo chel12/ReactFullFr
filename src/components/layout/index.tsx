@@ -8,6 +8,7 @@ import {
   selectIsAuthenticated,
   selectUser,
 } from "../../features/userSlice/userSlice"
+import Profile from "../profile"
 
 const Layout = () => {
   const isAuthenticated = useSelector(selectIsAuthenticated)
@@ -35,7 +36,9 @@ const Layout = () => {
 			 */}
           <Outlet />
         </div>
-        <div>...Профиль...</div>
+        <div className="flex-2 p-4">
+          <div className="flex-col flex gap-5">{!user && <Profile />}</div>
+        </div>
       </Container>
     </>
   )
