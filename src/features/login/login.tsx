@@ -54,6 +54,8 @@ const Login: React.FC<Props> = ({ setSelected }) => {
   const onSubmit = async (data: Login) => {
     try {
       await login(data).unwrap()
+      await triggerCurrentCuery()
+      navigate("/")
     } catch (error) {
       if (hasErrorField(error)) {
         setError(error.data.error)
