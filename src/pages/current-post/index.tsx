@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 import { useGetPostByIdQuery } from "../../app/services/postsApi"
 import Card from "../../components/card"
 import { GoBack } from "../../components/go-back"
+import CreateComment from "../../components/create-comment"
 
 const CurrentPost = () => {
   //чтобы при переходе url адрес id:значение поста брать
@@ -39,6 +40,25 @@ const CurrentPost = () => {
         likedByUser={likedByUser}
         createdAt={createdAt}
       />
+      <div className="mt-10">
+        <CreateComment />
+      </div>
+      <div className="mt-10">
+        {data.comments
+          ? data.comments.map(comment => (
+              <Card
+                cardFor="comment"
+                key={comment.id}
+                avatarUrl={comment.user.avatarUrl ?? ""}
+                content={comment.content}
+                name={comment.user.name ?? ""}
+                authorId={comment.userId}
+                commentId={comment.id}
+                id={id}
+              />
+            ))
+          : null}
+      </div>
     </>
   )
 }
