@@ -1,7 +1,6 @@
 import { Button, Card, Image, useDisclosure } from "@nextui-org/react"
 import { useParams } from "react-router-dom"
 import { resetUser, selectCurrent } from "../../features/userSlice/userSlice"
-
 import {
   useGetUserByIdQuery,
   useLazyCurrentQuery,
@@ -23,6 +22,7 @@ import { ProfileInfo } from "../../components/profile-info"
 import { formatToClientDate } from "../../utils/format-to-client-date"
 import { CountInfo } from "../../components/count-info"
 import { useEffect } from "react"
+import { EditProfile } from "../../components/edit-profile"
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>()
@@ -49,13 +49,27 @@ const UserProfile = () => {
         await triggerGetUserByIdQuery(id)
         await triggerCurrentQuery()
       }
-    } catch (error) {}
-    
+    } catch (error) {
+      console.log()
+    }
+  }
+
+  const handleClose = async () => {
+    try {
+      if (id) {
+        await triggerGetUserByIdQuery(id)
+        await triggerCurrentQuery()
+        onClose()
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   if (!data) {
     return null
   }
+
   return (
     <>
       <GoBack />
@@ -88,7 +102,9 @@ const UserProfile = () => {
                 {data.isFollowing ? "Отписаться" : "Подписаться"}
               </Button>
             ) : (
-              <Button endContent={<CiEdit />}>Редактировать</Button>
+              <Button endContent={<CiEdit />} onClick={onOpen}>
+                Редактировать
+              </Button>
             )}
           </div>
         </Card>
@@ -109,6 +125,7 @@ const UserProfile = () => {
           </div>
         </Card>
       </div>
+      <EditProfile isOpen={isOpen} onClose={handleClose} user={data} />
     </>
   )
 }
