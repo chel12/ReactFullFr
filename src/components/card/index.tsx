@@ -11,6 +11,7 @@ import {
   useUnlikePostMutation,
 } from "../../app/services/likesApi"
 import {
+  getPostById,
   useDeletePostMutation,
   useLazyGetAllPostsQuery,
   useLazyGetPostByIdQuery,
@@ -29,6 +30,7 @@ import { FcDislike } from "react-icons/fc"
 import { MdOutlineFavoriteBorder } from "react-icons/md"
 import { FaRegComment } from "react-icons/fa"
 import ErrorMessage from "../error-message"
+import { hasErrorField } from "../../utils/has-error-field"
 
 type Props = {
   avatarUrl: string
@@ -68,6 +70,51 @@ const Card: React.FC<Props> = ({
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrent)
 
+  //обновление данных в зависимости от CardFor 
+  const refetchPosts = async () => {
+    switch (cardFor) {
+      case "post":
+        await triggerGetAllPosts().unwrap()
+        break
+      case "current-post":
+        await triggerGetAllPosts().unwrap()
+        break
+      case "comment":
+        await triggerGetPostById(id).unwrap()
+        break
+      default:
+        throw new Error("Неверный аргумент cardFor")
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      switch (cardFor) {
+        case "post":
+          await deletePost(id).unwrap()
+          await refetchPosts()
+          break
+        case "current-post":
+          await deletePost(id).unwrap()
+          //если мы были в посте, перекинь нас на страницу назад
+          navigate("/")
+          break
+        case "comment":
+          await deleteComment(id).unwrap()
+          await refetchPosts()
+          break
+        default:
+          throw new Error("Неверный аргумент cardFor")
+      }
+    } catch (error) {
+      if (hasErrorField(error)) {
+        setError(error.data.error)
+      } else {
+        setError(error as string)
+      }
+    }
+  }
+
   return (
     <NextUiCard className="mb-5">
       <CardHeader className="justify-between items-center bg-transparent">
@@ -82,7 +129,7 @@ const Card: React.FC<Props> = ({
         {/*если автор и текущий пользователь равны тогда покажи кнопку удалить
 		  но с условием что загрузки нет*/}
         {authorId === currentUser?.id && (
-          <div className="cursor-pointer">
+          <div className="cursor-pointer" onClick={handleDelete}>
             {deletePostStatus.isLoading || deleteCommentStatus.isLoading ? (
               <Spinner />
             ) : (
