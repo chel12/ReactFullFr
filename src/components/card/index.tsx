@@ -20,7 +20,6 @@ import { useDeleteCommentMutation } from "../../app/services/commentsApi"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { selectCurrent } from "../../features/userSlice/userSlice"
-import { useSelector } from "react-redux"
 import { formatToClientDate } from "../../utils/format-to-client-date"
 import User from "../user"
 import { RiDeleteBinLine } from "react-icons/ri"
@@ -31,6 +30,7 @@ import { MdOutlineFavoriteBorder } from "react-icons/md"
 import { FaRegComment } from "react-icons/fa"
 import ErrorMessage from "../error-message"
 import { hasErrorField } from "../../utils/has-error-field"
+import { useAppSelector } from "../../app/hooks"
 
 type Props = {
   avatarUrl: string
@@ -68,7 +68,7 @@ const Card: React.FC<Props> = ({
 
   const [error, setError] = useState("")
   const navigate = useNavigate()
-  const currentUser = useSelector(selectCurrent)
+  const currentUser = useAppSelector(selectCurrent)
 
   //обновление данных в зависимости от CardFor
   const refetchPosts = async () => {
@@ -119,7 +119,7 @@ const Card: React.FC<Props> = ({
       likedByUser
         ? await unlikePost(id).unwrap()
         : await likePost({ postId: id }).unwrap()
-      await refetchPosts()
+      await triggerGetPostById(id).unwrap()
     } catch (error) {
       if (hasErrorField(error)) {
         setError(error.data.error)
