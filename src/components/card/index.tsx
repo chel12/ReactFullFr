@@ -70,7 +70,7 @@ const Card: React.FC<Props> = ({
   const navigate = useNavigate()
   const currentUser = useSelector(selectCurrent)
 
-  //обновление данных в зависимости от CardFor 
+  //обновление данных в зависимости от CardFor
   const refetchPosts = async () => {
     switch (cardFor) {
       case "post":
@@ -114,7 +114,20 @@ const Card: React.FC<Props> = ({
       }
     }
   }
-
+  const handleClick = async () => {
+    try {
+      likedByUser
+        ? await unlikePost(id).unwrap()
+        : await likePost({ postId: id }).unwrap()
+      await refetchPosts()
+    } catch (error) {
+      if (hasErrorField(error)) {
+        setError(error.data.error)
+      } else {
+        setError(error as string)
+      }
+    }
+  }
   return (
     <NextUiCard className="mb-5">
       <CardHeader className="justify-between items-center bg-transparent">
@@ -144,7 +157,7 @@ const Card: React.FC<Props> = ({
       {cardFor !== "comment" && (
         <CardFooter className="gap-3">
           <div className="flex gap-5 items-center">
-            <div>
+            <div onClick={handleClick}>
               <MetaInfo
                 count={likesCount}
                 Icon={likedByUser ? FcDislike : MdOutlineFavoriteBorder}
